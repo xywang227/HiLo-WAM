@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="HiLo-WAM decouples long-horizon task evolution and local dynamics through two visual streams for robot action generation.">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="referrer" content="no-referrer">
+  <meta property="og:title" content="HiLo-WAM: Decoupling Long-Horizon Task Evolution and Local Dynamics in World Action Models">
+  <meta property="og:description" content="Sparse task evolution and dense local dynamics jointly guide robot action generation.">
+  <meta property="og:type" content="website">
+  <title>HiLo-WAM | Long-Horizon Task Evolution and Local Dynamics</title>
+  <link rel="icon" href="static/images/favicon.svg">
+  <link rel="stylesheet" href="static/css/index.css">
+  <script src="static/js/index.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="nav-shell">
+  <a class="brand" href="#top">HiLo-WAM</a>
+  <button class="nav-toggle" id="navToggle" type="button" aria-controls="navLinks" aria-expanded="false">Menu</button>
+  <nav id="navLinks" aria-label="Main navigation"><a href="#overview">Overview</a><a href="#method">Method</a><a href="#results">Experiments</a><a href="#real-world">Real robot</a></nav>
+</div></header>
+<main id="main" class="container">
+<section class="hero" id="top">
+  <h1><span>HiLo-WAM:</span> Decoupling Long-Horizon Task Evolution and Local Dynamics in World Action Models</h1>
+  <p class="authors"><span>Xingyu Wang<sup>1,2</sup></span><span>Yanjiang Guo<sup>3</sup></span><span>Zhijing Ding<sup>1</sup></span><span>Jiaxin Fang<sup>4,1</sup></span><span>Zeyu Lai<sup>5,1</sup></span><span>Jiayu Dong<sup>1</sup></span><span>Weikang Wan<sup>1,5</sup></span><span>Jianyu Chen<sup>3</sup></span><span>Yuxiang Gao<sup>1,†</sup></span><span>Mengdi Xu<sup>3,†</sup></span></p>
+<p class="affiliations"><span><sup>1</sup> CoCoMatrix</span><span><sup>2</sup> Institute of Automation, Chinese Academy of Sciences</span><span><sup>3</sup> Tsinghua University</span><span><sup>4</sup> Fudan University</span><span><sup>5</sup> University of California, San Diego</span></p>
+<p class="correspondence">† Corresponding author</p>
+  <div class="hero-actions"><a class="button primary" href="#real-videos">Robot demos</a><a class="button" href="#method">Method</a><a class="button" href="https://github.com/xywang227/HiLo-WAM/tree/main" target="_blank" rel="noopener noreferrer">Code ↗</a></div>
+</section>
+<section id="overview" class="overview" aria-label="Overview">
+  <p class="tldr"><strong>TL;DR</strong> HiLo-WAM decouples <strong>long-horizon task evolution</strong> from <strong>local visual dynamics</strong>. A sparse stream provides historical context and coarse future evolution; a dense stream captures fine-grained robot–object interactions. Together, they guide action generation.</p>
+  <figure class="paper-figure teaser">
+<a href="static/figures/teaser.webp" data-lightbox aria-label="Enlarge: Overview of two visual streams, simulation benchmarks, and real-world manipulation"><img src="static/figures/teaser.webp" width="2266" height="1156" alt="Overview of two visual streams, simulation benchmarks, and real-world manipulation" loading="lazy" decoding="async"><span class="zoom-hint" aria-hidden="true">↗</span></a>
+<figcaption>Sparse task evolution + dense local dynamics → coordinated action generation.</figcaption></figure>
+  <div class="metrics"><p><strong>93.70%</strong><span>RoboTwin 2.0 success</span></p><p><strong>17.43</strong><span>RoboDojo progress score</span></p><p><strong>30%</strong><span>Real-robot OOD success</span></p></div>
+</section>
+<section id="method" class="section">
+  <h2>Two temporal scales, one coordinated policy</h2>
+  <p>HiLo-WAM decouples <strong>long-horizon task evolution</strong> and <strong>local visual dynamics</strong> within a shared Video DiT, coupled to an Action DiT. Three design choices make this decomposition useful for control.</p>
+  <figure class="paper-figure framework">
+<a href="static/figures/framework.webp" data-lightbox aria-label="Enlarge: HiLo-WAM architecture and progressive stream-wise inference"><img src="static/figures/framework.webp" width="1826" height="1036" alt="HiLo-WAM architecture and progressive stream-wise inference" loading="lazy" decoding="async"><span class="zoom-hint" aria-hidden="true">↗</span></a>
+<figcaption>A unified dual-DiT architecture with two visual streams and progressive stream-wise inference.</figcaption></figure>
+  <div class="contribution-grid">
+    <article><span class="contribution-number">01</span><h3>Decouple temporal roles</h3><p>Sparse history and future keyframes capture task evolution; dense short-horizon frames model fine-grained robot–object interactions.</p></article>
+    <article><span class="contribution-number">02</span><h3>Coordinate the streams</h3><p>Structured cross-stream attention lets historical context and near-future latents guide local dynamics and actions, while distant futures remain indirect.</p></article>
+    <article><span class="contribution-number">03</span><h3>Reuse visual computation</h3><p>Progressive stream-wise inference caches completed visual streams while actions continue to refine, reducing inference latency by <strong>27.5%</strong>.</p></article>
+  </div>
+  <details class="method-details"><summary>Attention mask, notation, and training details</summary><div class="attention-layout">
+    <figure class="paper-figure ">
+<a href="static/figures/attention.webp" data-lightbox aria-label="Enlarge: Structured cross-stream attention mask"><img src="static/figures/attention.webp" width="498" height="514" alt="Structured cross-stream attention mask" loading="lazy" decoding="async"><span class="zoom-hint" aria-hidden="true">↗</span></a>
+<figcaption>Q: queries (rows). K: keys (columns). Colored cells allow attention.</figcaption></figure>
+    <div><h3>Structured cross-stream attention</h3>
+      <p>The long-horizon stream attends bidirectionally within itself. Local and action tokens access historical context and the nearest coarse future latent; distant future latents provide <strong>indirect guidance only</strong>. Actions also attend to local dynamics and robot state. Visual tokens do not attend to actions.</p>
+      <p class="note">Z denotes latent tokens; H / L / A identify the long-horizon / local / action streams.</p>
+      <dl class="symbol-guide">
+        <dt>Z<sup>H,ctx</sup><sub>t</sub></dt><dd>Long-horizon historical context</dd>
+        <dt>Z<sup>H,near</sup><sub>t</sub></dt><dd>Nearest coarse future latent frame</dd>
+        <dt>Z<sup>H,far</sup><sub>t</sub></dt><dd>Distant coarse future latent frames</dd>
+        <dt>Z<sup>L</sup><sub>t</sub></dt><dd>Local visual dynamics tokens</dd>
+        <dt>q<sub>t</sub> / Z<sup>A</sup><sub>t</sub></dt><dd>Robot state / action tokens at time <i>t</i></dd>
+      </dl>
+    </div>
+  </div>
+<div class="details-body"><p>Joint flow matching uses independently sampled flow times for the long-horizon, local, and action streams. Historical observations, the current observation, and robot state remain clean conditions.</p><p><strong>Reported configuration:</strong> Wan2.2-5B video backbone; stride <i>k</i> = 4; 8 historical and 8 future keyframes; video horizon <i>T</i> = 32; action horizon <i>H</i> = 32. Inference uses 5 / 5 / 10 steps for the long-horizon / local / action streams, within the general schedule n<sub>H</sub> ≤ n<sub>L</sub> ≤ n<sub>A</sub>.</p></div></details>
+</section>
+<section id="results" class="section" data-tabs>
+  <h2>Experimental results</h2>
+  <p><strong>93.70% success on RoboTwin 2.0</strong> and <strong>17.43 progress on RoboDojo</strong>. Complementary temporal modeling improves manipulation, while progressive inference reduces its computational overhead.</p>
+  <div class="section-tabs" data-tab-list aria-label="Experimental evidence" hidden>
+    <button type="button" data-tab="benchmarks" id="tab-benchmarks">Simulation benchmarks</button>
+    <button type="button" data-tab="analysis" id="tab-analysis">Ablations &amp; visual analysis</button>
+    <button type="button" data-tab="efficiency" id="tab-efficiency">Inference efficiency</button>
+  </div>
+  <div id="benchmarks" data-tab-panel>
+    <div class="two-column benchmarks"><article><h3>RoboTwin 2.0</h3><div class="table-scroll" tabindex="0" role="region" aria-label="RoboTwin 2.0 results"><table class=""><caption>RoboTwin 2.0 · Success rate (%)</caption><thead><tr><th scope="col">Method</th><th scope="col">Embodied<br>pretraining</th><th scope="col">Clean</th><th scope="col">Rand.</th><th scope="col">Avg.</th></tr></thead><tbody><tr><th scope="row">π₀</th><td>Yes</td><td>65.90</td><td>58.40</td><td>62.15</td></tr><tr><th scope="row">X-VLA</th><td>Yes</td><td>72.90</td><td>72.80</td><td>72.85</td></tr><tr><th scope="row">π₀.₅</th><td>Yes</td><td>82.70</td><td>76.80</td><td>79.75</td></tr><tr><th scope="row">StarVLA</th><td>No</td><td>88.20</td><td>88.30</td><td>88.25</td></tr><tr><th scope="row">ABot-M0</th><td>Yes</td><td>81.20</td><td>80.40</td><td>80.80</td></tr><tr><th scope="row">LingBot-VLA</th><td>Yes</td><td>86.50</td><td>85.30</td><td>85.90</td></tr><tr><th scope="row">JEPA-VLA</th><td>No</td><td>73.50</td><td>—</td><td>—</td></tr><tr><th scope="row">Motus</th><td>Yes</td><td>88.70</td><td>87.00</td><td>87.85</td></tr><tr><th scope="row">LingBot-VA</th><td>Yes</td><td>92.90</td><td>91.50</td><td>92.20</td></tr><tr><th scope="row">Fast-WAM</th><td>No</td><td>91.90</td><td>91.80</td><td>91.85</td></tr><tr><th scope="row">Being-H0.7</th><td>Yes</td><td>90.20</td><td>89.60</td><td>89.90</td></tr><tr><th scope="row">AHA-WAM</th><td>No</td><td>93.40</td><td>92.20</td><td>92.80</td></tr><tr class="ours"><th scope="row">HiLo-WAM</th><td>No</td><td>93.87</td><td>93.52</td><td>93.70</td></tr></tbody></table></div><p class="note">50 bimanual tasks; 50 trials per task in each setting. “Embodied pretraining” refers to robot/action pretraining.</p></article><article><h3>RoboDojo</h3><div class="table-scroll" tabindex="0" role="region" aria-label="RoboDojo results"><table class=""><caption>RoboDojo · Long-horizon evaluation</caption><thead><tr><th scope="col">Method</th><th scope="col">Score ↑</th><th scope="col">Success (%) ↑</th></tr></thead><tbody><tr><th scope="row">OpenVLA-OFT</th><td>0.70</td><td>0.00</td></tr><tr><th scope="row">RDT</th><td>1.13</td><td>0.00</td></tr><tr><th scope="row">LDA-1B</th><td>1.98</td><td>0.08</td></tr><tr><th scope="row">H-RDT</th><td>2.23</td><td>0.17</td></tr><tr><th scope="row">π₀</th><td>6.19</td><td>2.00</td></tr><tr><th scope="row">GROOT-N1.7</th><td>8.30</td><td>3.58</td></tr><tr><th scope="row">LingBot-VLA</th><td>10.89</td><td>5.25</td></tr><tr><th scope="row">StarVLA</th><td>14.15</td><td>6.50</td></tr><tr><th scope="row">StarVLA-OFT</th><td>14.28</td><td>6.17</td></tr><tr><th scope="row">AHA-WAM</th><td>8.61</td><td>2.67</td></tr><tr><th scope="row">Fast-WAM</th><td>9.14</td><td>5.17</td></tr><tr class="ours"><th scope="row">HiLo-WAM</th><td>17.43</td><td>6.50</td></tr></tbody></table></div><p class="note">8 long-horizon tasks; 50 trials per task. Progress measures partial completion. The 6.50% full-task success rate ties the highest result among these comparisons.</p></article></div>
+  <details><summary>Qualitative rollouts: target consistency and final alignment</summary><div class="details-body"><figure class="paper-figure ">
+<a href="static/figures/performance.webp" data-lightbox aria-label="Enlarge: Fast-WAM and HiLo-WAM rollouts for bottle disposal, mug hanging, and house assembly"><img src="static/figures/performance.webp" width="2202" height="1371" alt="Fast-WAM and HiLo-WAM rollouts for bottle disposal, mug hanging, and house assembly" loading="lazy" decoding="async"><span class="zoom-hint" aria-hidden="true">↗</span></a>
+<figcaption>Example rollouts show more consistent target selection and precise final alignment with HiLo-WAM.</figcaption></figure></div></details>
+
+  </div>
+  <div id="analysis" data-tab-panel>
+    <div class="evidence-heading"><h3>Task evolution and local dynamics are complementary</h3><p>The full model improves success by <strong>3.12 percentage points</strong> over local dynamics alone. Attention and video predictions illustrate how long-horizon context guides the current interaction.</p></div>
+    <div class="evidence-grid">
+      <div class="ablation-chart" role="group" aria-label="Visual-stream ablations on RoboTwin 2.0">
+        <p class="chart-label">RoboTwin 2.0 · Average success rate (%)</p>
+        <ol class="ablation-bars"><li class="ablation-row "><div class="bar-label"><span>Local dynamics only</span><strong>90.58%</strong></div><div class="bar-track" aria-hidden="true"><span style="--bar-width:14.5%"></span></div></li><li class="ablation-row "><div class="bar-label"><span>No direct history access¹</span><strong>93.22%</strong></div><div class="bar-track" aria-hidden="true"><span style="--bar-width:80.5%"></span></div></li><li class="ablation-row "><div class="bar-label"><span>No local dynamics</span><strong>93.52%</strong></div><div class="bar-track" aria-hidden="true"><span style="--bar-width:88%"></span></div></li><li class="ablation-row best"><div class="bar-label"><span>Full HiLo-WAM</span><strong>93.70%</strong></div><div class="bar-track" aria-hidden="true"><span style="--bar-width:92.5%"></span></div></li></ol>
+        <div class="bar-axis" aria-hidden="true"><span>90</span><span>91</span><span>92</span><span>93</span><span>94</span></div>
+        <p class="axis-note">Zoomed scale: 90–94%; bars start at 90%.</p>
+      </div>
+      <figure class="paper-figure attention-evidence">
+<a href="static/figures/attention_vis.webp" data-lightbox aria-label="Enlarge: Cross-stream attention on Stack Bowls Three"><img src="static/figures/attention_vis.webp" width="1494" height="1046" alt="Cross-stream attention on Stack Bowls Three" loading="lazy" decoding="async"><span class="zoom-hint" aria-hidden="true">↗</span></a>
+<figcaption><strong>Complementary attention.</strong> Long-horizon context tracks robot and object positions; local dynamics captures fine-grained interactions.</figcaption></figure>
+    </div>
+    <p class="note ablation-footnote">¹ History remains inside the long-horizon stream for future prediction; only direct access from local/action tokens is masked.</p>
+    <div class="supporting-evidence">
+      <figure class="paper-figure ">
+<a href="static/figures/video_predict.webp" data-lightbox aria-label="Enlarge: Ground truth and Place Can Basket predictions with and without long-horizon guidance"><img src="static/figures/video_predict.webp" width="1495" height="562" alt="Ground truth and Place Can Basket predictions with and without long-horizon guidance" loading="lazy" decoding="async"><span class="zoom-hint" aria-hidden="true">↗</span></a>
+<figcaption><strong>Task-directed prediction.</strong> Long-horizon grasp-to-place evolution guides the local grasp on <em>Place Can Basket</em>.</figcaption></figure>
+      <figure class="paper-figure ">
+<a href="static/figures/temporal_scale.webp" data-lightbox aria-label="Enlarge: RoboTwin success rates at strides 1, 2, 4, and 8"><img src="static/figures/temporal_scale.webp" width="1396" height="954" alt="RoboTwin success rates at strides 1, 2, 4, and 8" loading="lazy" decoding="async"><span class="zoom-hint" aria-hidden="true">↗</span></a>
+<figcaption><strong>Coverage–resolution balance.</strong> At a fixed token budget, stride k = 4 performs best (93.7%).</figcaption></figure>
+    </div>
+  </div>
+  <div id="efficiency" data-tab-panel>
+    <div class="efficiency-summary"><div><h3>Less visual computation, comparable success</h3><p>Coordinated denoising reduces latency by <strong>27.5%</strong> versus sequential inference with the <strong>same per-stream step budgets</strong>; success remains comparable (93.64% → 93.70%).</p><p class="note">Completed visual features are cached while action refinement continues. Real-Time Chunking further overlaps inference with execution on the robot.</p></div><div><div class="table-scroll" tabindex="0" role="region" aria-label="Action-chunk inference · RoboTwin 2.0"><table><caption>Action-chunk inference · RoboTwin 2.0</caption><thead><tr><th scope="col">Method</th><th scope="col">Latency (ms) ↓</th><th scope="col">Frequency (Hz) ↑</th><th scope="col">SR (%) ↑</th></tr></thead><tbody><tr><th scope="row">π₀.₅</th><td>110</td><td>9.09</td><td>79.75</td></tr><tr><th scope="row">Fast-WAM</th><td>182</td><td>5.49</td><td>91.85</td></tr><tr><th scope="row">HiLo-WAM w/o Prog.</th><td>404</td><td>2.48</td><td>93.64</td></tr><tr class="ours"><th scope="row">HiLo-WAM</th><td>293</td><td>3.41</td><td>93.70</td></tr></tbody></table></div></div></div>
+    <p class="note">End-to-end action-chunk latency includes the video VAE and both DiTs, with prompt embeddings reused. HiLo-WAM remains slower than Fast-WAM.</p>
+  </div>
+</section>
+<section id="real-world" class="section">
+  <h2>Real-world manipulation</h2>
+  <p>We evaluate three bimanual tasks on <strong>Fourier GR-3</strong>: Build House, Disassemble House, and Disassemble Heart.</p>
+  <div class="scene-pair"><figure><a href="static/figures/robot-id.webp" data-lightbox aria-label="Enlarge: In-domain robot setup"><img src="static/figures/robot-id.webp" width="900" height="1200" alt="Complete in-domain Fourier GR-3 setup" loading="lazy"></a><figcaption>In-domain (ID)</figcaption></figure><figure><a href="static/figures/robot-ood.webp" data-lightbox aria-label="Enlarge: Out-of-distribution robot setup"><img src="static/figures/robot-ood.webp" width="900" height="1200" alt="Complete out-of-distribution Fourier GR-3 setup" loading="lazy"></a><figcaption>Out-of-distribution (OOD)</figcaption></figure></div>
+  <p>OOD evaluation changes lighting, tabletop background, and clutter. Each task uses 10 trials per setting, with a <strong>0–10 progress score</strong> and separate full-task success rate. HiLo-WAM achieves the highest average progress and success among the three compared models: <strong>6.9 / 33% in-domain</strong> and <strong>6.0 / 30% OOD</strong>.</p>
+  <figure class="paper-figure real-results">
+<a href="static/figures/real_world.webp" data-lightbox aria-label="Enlarge: Progress scores and success rates of three models on three real-world tasks in ID and OOD settings"><img src="static/figures/real_world.webp" width="1720" height="525" alt="Progress scores and success rates of three models on three real-world tasks in ID and OOD settings" loading="lazy" decoding="async"><span class="zoom-hint" aria-hidden="true">↗</span></a>
+<figcaption>Success rate (top) and progress score (bottom). Values follow the rounded results reported in the paper.</figcaption></figure>
+  <div id="real-videos" class="video-section" data-tabs><div class="video-toolbar"><div><h3>Robot rollouts</h3><p class="note">Select a task to compare the three policies.</p></div><div class="speed-panel" role="group" aria-label="Playback speed"><span>Speed</span><button type="button" data-speed="1" aria-pressed="true">1×</button><button type="button" data-speed="2" aria-pressed="false">2×</button><button type="button" data-speed="3" aria-pressed="false">3×</button></div></div>
+  <div class="section-tabs task-tabs" data-tab-list aria-label="Robot demonstration task" hidden>
+<button type="button" data-tab="demo-build_house" id="tab-build_house">Build House</button>
+<button type="button" data-tab="demo-disassemble_house" id="tab-disassemble_house">Disassemble House</button>
+<button type="button" data-tab="demo-disassemble_heart" id="tab-disassemble_heart">Disassemble Heart</button>
+</div>
+<section class="video-task-row" aria-labelledby="build_house" id="demo-build_house" data-tab-panel><div class="task-heading"><h4 id="build_house">Build House</h4><div class="row-controls"><button type="button" data-play-row>Play row</button><button type="button" data-pause-row>Pause row</button></div></div><p class="task-description">Align and connect the blocks, then lift and place the assembled structure.</p><div class="video-grid"><figure class="video-card "><figcaption>π₀.₅</figcaption>
+<video controls muted playsinline preload="none" poster="static/posters/build_house_pi05.jpg" aria-label="Build House — π₀.₅"><source src="videos/build_house_pi05.mp4" type="video/mp4">Your browser does not support video. <a href="videos/build_house_pi05.mp4">Download rollout</a>.</video></figure><figure class="video-card "><figcaption>Fast-WAM</figcaption>
+<video controls muted playsinline preload="none" poster="static/posters/build_house_fastwam.jpg" aria-label="Build House — Fast-WAM"><source src="videos/build_house_fastwam.mp4" type="video/mp4">Your browser does not support video. <a href="videos/build_house_fastwam.mp4">Download rollout</a>.</video></figure><figure class="video-card ours"><figcaption>HiLo-WAM</figcaption>
+<video controls muted playsinline preload="none" poster="static/posters/build_house_hilowam.jpg" aria-label="Build House — HiLo-WAM"><source src="videos/build_house_hilowam.mp4" type="video/mp4">Your browser does not support video. <a href="videos/build_house_hilowam.mp4">Download rollout</a>.</video></figure></div></section><section class="video-task-row" aria-labelledby="disassemble_house" id="demo-disassemble_house" data-tab-panel><div class="task-heading"><h4 id="disassemble_house">Disassemble House</h4><div class="row-controls"><button type="button" data-play-row>Play row</button><button type="button" data-pause-row>Pause row</button></div></div><p class="task-description">Separate the structure and place its components in the designated regions.</p><div class="video-grid"><figure class="video-card "><figcaption>π₀.₅</figcaption>
+<video controls muted playsinline preload="none" poster="static/posters/disassemble_house_pi05.jpg" aria-label="Disassemble House — π₀.₅"><source src="videos/disassemble_house_pi05.mp4" type="video/mp4">Your browser does not support video. <a href="videos/disassemble_house_pi05.mp4">Download rollout</a>.</video></figure><figure class="video-card "><figcaption>Fast-WAM</figcaption>
+<video controls muted playsinline preload="none" poster="static/posters/disassemble_house_fastwam.jpg" aria-label="Disassemble House — Fast-WAM"><source src="videos/disassemble_house_fastwam.mp4" type="video/mp4">Your browser does not support video. <a href="videos/disassemble_house_fastwam.mp4">Download rollout</a>.</video></figure><figure class="video-card ours"><figcaption>HiLo-WAM</figcaption>
+<video controls muted playsinline preload="none" poster="static/posters/disassemble_house_hilowam.jpg" aria-label="Disassemble House — HiLo-WAM"><source src="videos/disassemble_house_hilowam.mp4" type="video/mp4">Your browser does not support video. <a href="videos/disassemble_house_hilowam.mp4">Download rollout</a>.</video></figure></div></section><section class="video-task-row" aria-labelledby="disassemble_heart" id="demo-disassemble_heart" data-tab-panel><div class="task-heading"><h4 id="disassemble_heart">Disassemble Heart</h4><div class="row-controls"><button type="button" data-play-row>Play row</button><button type="button" data-pause-row>Pause row</button></div></div><p class="task-description">Remove the yellow blocks, then separate the remaining red structure.</p><div class="video-grid"><figure class="video-card "><figcaption>π₀.₅</figcaption>
+<video controls muted playsinline preload="none" poster="static/posters/disassemble_heart_pi05.jpg" aria-label="Disassemble Heart — π₀.₅"><source src="videos/disassemble_heart_pi05.mp4" type="video/mp4">Your browser does not support video. <a href="videos/disassemble_heart_pi05.mp4">Download rollout</a>.</video></figure><figure class="video-card "><figcaption>Fast-WAM</figcaption>
+<video controls muted playsinline preload="none" poster="static/posters/disassemble_heart_fastwam.jpg" aria-label="Disassemble Heart — Fast-WAM"><source src="videos/disassemble_heart_fastwam.mp4" type="video/mp4">Your browser does not support video. <a href="videos/disassemble_heart_fastwam.mp4">Download rollout</a>.</video></figure><figure class="video-card ours"><figcaption>HiLo-WAM</figcaption>
+<video controls muted playsinline preload="none" poster="static/posters/disassemble_heart_hilowam.jpg" aria-label="Disassemble Heart — HiLo-WAM"><source src="videos/disassemble_heart_hilowam.mp4" type="video/mp4">Your browser does not support video. <a href="videos/disassemble_heart_hilowam.mp4">Download rollout</a>.</video></figure></div></section>
+  <p id="videoStatus" class="status-message" role="status" aria-live="polite"></p></div>
+</section>
+<details><summary>Limitations</summary><div class="details-body"><p>Performance remains bounded by the video backbone’s semantic understanding and predictive capability. Explicit subtask decomposition, progress estimation, and higher-level reasoning remain challenging.</p></div></details>
+</main>
+<footer class="site-footer container"><span>HiLo-WAM · Project page</span><a href="#top">Back to top ↑</a></footer>
+<dialog id="figureDialog" aria-label="Expanded figure"><div class="dialog-toolbar"><span>Figure detail</span><button id="closeFigure" type="button">Close ×</button></div><img id="expandedFigure" alt=""><p id="figureCaption"></p></dialog>
+</body>
+</html>
