@@ -1,0 +1,14 @@
+HiLo-WAM
+
+This project is derived from FastWAM. The original MIT copyright notice is
+preserved in LICENSE. HiLo-WAM model names and package names identify the
+hierarchical model and this distribution, while upstream attribution remains.
+
+The adapted LeRobot dataset reader and utilities retain their original
+Hugging Face copyright notices and Apache-2.0 headers in src/hilo_wam/datasets.
+NVIDIA-derived utilities retain their original Apache-2.0 notices and headers.
+The Apache License, Version 2.0 is included in LICENSES/Apache-2.0.txt.
+
+Vendored RoboTwin code retains its own MIT license at third_party/RoboTwin/LICENSE.
+Its source revision and local integration are documented in
+third_party/RoboTwin/README.vendor.md.
