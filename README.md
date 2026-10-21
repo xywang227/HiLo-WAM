@@ -2,7 +2,10 @@
 
 **HiLo-WAM** is a hierarchical world action model built on Wan2.2-TI2V-5B. A high-level video branch models sparse keyframes, while a low-level video branch and an action expert predict local motion and robot actions through mixed attention.
 
-[中文说明](README_zh.md)
+[![English](https://img.shields.io/badge/README-English-111111.svg)](./README.md)
+[![中文](https://img.shields.io/badge/README-%E4%B8%AD%E6%96%87-d14836.svg)](./README_zh.md)
+
+[![Project Page](https://img.shields.io/badge/Project_Page-HiLo--WAM-2ea44f.svg)](https://xywang227.github.io/HiLo-WAM/)
 
 This release includes the default configuration, training, and policy evaluation for **RoboTwin**, and the default configuration and training for **RoboDojo**. RoboDojo policy integration and evaluation belong in the official RoboDojo repository. Training uses **LeRobot v3.0** datasets.
 

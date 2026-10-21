@@ -2,7 +2,10 @@
 
 **HiLo-WAM** 是基于 Wan2.2-TI2V-5B 的分层世界动作模型。高层视频分支预测稀疏关键帧，低层视频分支和动作专家通过混合注意力预测局部运动及机器人动作。
 
-[English](README.md)
+[![English](https://img.shields.io/badge/README-English-111111.svg)](./README.md)
+[![中文](https://img.shields.io/badge/README-%E4%B8%AD%E6%96%87-d14836.svg)](./README_zh.md)
+
+[![Project Page](https://img.shields.io/badge/Project_Page-HiLo--WAM-2ea44f.svg)](https://xywang227.github.io/HiLo-WAM/)
 
 本仓库提供 **RoboTwin 默认配置、训练和策略评测**，以及 **RoboDojo 默认配置和训练**。RoboDojo 推理与评测适配放在官方 RoboDojo 仓库中。本仓库训练使用 **LeRobot v3.0** 格式数据。
 
