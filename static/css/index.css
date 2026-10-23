@@ -170,7 +170,7 @@ body:has(dialog[open]) { overflow: hidden; }
 .evidence-heading h3 { font-size: 20px; }
 .evidence-heading p { font-size: 14px; max-width: 900px; }
 .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: center; padding: 18px 0 8px; }
-.evidence-grid > *, .supporting-evidence > *, .efficiency-summary > * { min-width: 0; }
+.evidence-grid > *, .supporting-evidence > *, .progressive-layout > * { min-width: 0; }
 .chart-label { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
 .ablation-bars { list-style: none; padding: 0; margin: 0; display: grid; gap: 15px; }
 .bar-label { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 7px; font-size: 13px; }
@@ -187,18 +187,13 @@ body:has(dialog[open]) { overflow: hidden; }
 .supporting-evidence { display: grid; grid-template-columns: 1.9fr 1fr; align-items: center; gap: 28px; border-top: 1px solid var(--line); margin-top: 20px; padding-top: 20px; }
 .supporting-evidence .paper-figure { margin: 0; }
 .supporting-evidence figcaption, .evidence-grid figcaption { text-align: left; font-size: 12px; }
-.efficiency-summary { display: grid; grid-template-columns: .85fr 1.15fr; align-items: center; gap: 28px; padding-block: 16px; }
-.efficiency-summary p { font-size: 14px; }
-.efficiency-summary .note { font-size: 12px; }
-.efficiency-summary table { font-size: 11px; }
-.efficiency-summary th, .efficiency-summary td { padding-inline: 6px; }
 .task-tabs { margin-bottom: 10px; }
 .video-task-row[role="tabpanel"] { margin-top: 12px; }
 @media (max-width: 760px) {
   .contribution-grid { grid-template-columns: 1fr; gap: 14px; }
   .contribution-grid article { padding-top: 8px; }
   .contribution-number { float: left; margin: 7px 10px 0 0; }
-  .evidence-grid, .supporting-evidence, .efficiency-summary { grid-template-columns: 1fr; gap: 22px; }
+  .evidence-grid, .supporting-evidence, .progressive-layout { grid-template-columns: 1fr; gap: 22px; }
   .attention-evidence { max-width: 440px; }
   .attention-evidence img { max-height: none; }
   .supporting-evidence .paper-figure:last-child { max-width: 340px; margin: 0 auto; }
@@ -209,4 +204,23 @@ body:has(dialog[open]) { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+}
+
+/* Progressive inference combines mechanism and cumulative experimental evidence. */
+.progressive-layout { display: grid; grid-template-columns: .85fr 1.15fr; gap: 36px; align-items: center; margin: 24px 0; }
+.inference-strategies { list-style: none; padding: 0; margin: 0; counter-reset: strategy; }
+.inference-strategies li { counter-increment: strategy; padding-left: 28px; position: relative; margin-bottom: 16px; }
+.inference-strategies li:last-child { margin-bottom: 0; }
+.inference-strategies li::before { content: counter(strategy, decimal-leading-zero); position: absolute; left: 0; top: 2px; font-size: 11px; color: var(--accent); font-weight: 700; }
+.inference-strategies strong { font-size: 14px; }
+.inference-strategies p { font-size: 13px; margin: 4px 0 0; }
+.latency-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.latency-row.best .bar-track > span { background: linear-gradient(90deg, #4c847b, #2c7160); }
+.latency-row.best .bar-label { color: #24594d; font-weight: 650; }
+.latency-row small { font-size: 11px; font-weight: 400; }
+.inference-note { margin-top: 12px; }
+.task-progression { max-width: 980px; margin-block: 25px; }
+@media (max-width: 760px) {
+  .progressive-layout { grid-template-columns: 1fr; gap: 24px; }
+  .progressive-table { font-size: 11px; }
 }
